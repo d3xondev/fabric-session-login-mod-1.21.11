@@ -1,3 +1,4 @@
+<img width="1920" height="1018" alt="Screenshot_20260922_184501" src="https://github.com/user-attachments/assets/61456065-8627-424f-a548-dcf99d073928" />
 # DexSessionLogin
 
 A Fabric mod for Minecraft 1.21.11 that adds session token login and account management.
