@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "dexsessionlogin",
+	"version": "${version}",
+	"name": "DexSessionLogin",
+	"description": "Session token login and account manager for Fabric 1.21.11.",
+	"authors": [
+		"Dex"
+	],
+	"contact": {
+		"sources": "https://github.com/Majanito/Fabric-Session-Login"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/dexsessionlogin/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"net.dex.sessionlogin.DexSessionLogin"
+		]
+	},
+	"mixins": [
+		"dexsessionlogin.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
