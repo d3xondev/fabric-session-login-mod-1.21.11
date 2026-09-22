@@ -20,7 +20,7 @@ public class AddAccountDialog extends Screen {
     private boolean isProcessing = false;
 
     public AddAccountDialog(Screen parent) {
-        super(Text.literal("Add Account"));
+        super(Text.literal("Add Account via Session ID"));
         this.parent = parent;
     }
 
@@ -35,10 +35,10 @@ public class AddAccountDialog extends Screen {
                 centerY - 25,
                 300,
                 20,
-                Text.literal("Session Token")
+                Text.literal("Session ID Input")
         );
         tokenField.setMaxLength(32767);
-        tokenField.setPlaceholder(Text.literal("Paste session token / access token here...").formatted(Formatting.GRAY));
+        tokenField.setPlaceholder(Text.literal("Paste Session ID here...").formatted(Formatting.GRAY));
         this.addDrawableChild(tokenField);
         this.setInitialFocus(tokenField);
 
@@ -48,16 +48,16 @@ public class AddAccountDialog extends Screen {
                 .build();
         this.addDrawableChild(switchNowCheckbox);
 
-        addButton = ButtonWidget.builder(Text.literal("Add Account"), button -> {
+        addButton = ButtonWidget.builder(Text.literal("Add Session ID"), button -> {
             String token = tokenField.getText().trim();
             if (token.isEmpty()) {
-                statusMessage = Text.literal("Token cannot be empty").formatted(Formatting.RED);
+                statusMessage = Text.literal("Session ID cannot be empty").formatted(Formatting.RED);
                 return;
             }
 
             isProcessing = true;
             addButton.active = false;
-            statusMessage = Text.literal("Validating token with Mojang API...").formatted(Formatting.YELLOW);
+            statusMessage = Text.literal("Validating Session ID with Mojang...").formatted(Formatting.YELLOW);
 
             MojangApiService.fetchProfileAsync(token).whenComplete((profile, throwable) -> {
                 if (this.client != null) {
@@ -65,7 +65,7 @@ public class AddAccountDialog extends Screen {
                         isProcessing = false;
                         addButton.active = true;
                         if (throwable != null || profile == null) {
-                            statusMessage = Text.literal("Invalid session token!").formatted(Formatting.RED);
+                            statusMessage = Text.literal("Invalid Session ID!").formatted(Formatting.RED);
                         } else {
                             Account account = new Account(profile.name(), profile.uuid(), token);
                             DexSessionLogin.getAccountManager().addOrUpdateAccount(account);
@@ -96,9 +96,17 @@ public class AddAccountDialog extends Screen {
 
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
-                Text.literal("Add Account via Session Token").formatted(Formatting.BOLD, Formatting.GOLD),
+                Text.literal("Add Account via Session ID").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
                 this.height / 2 - 60,
+                0xFFFFFF
+        );
+
+        context.drawTextWithShadow(
+                this.textRenderer,
+                Text.literal("Enter Session ID:").formatted(Formatting.WHITE),
+                this.width / 2 - 150,
+                this.height / 2 - 38,
                 0xFFFFFF
         );
 

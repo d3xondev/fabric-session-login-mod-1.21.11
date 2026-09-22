@@ -27,7 +27,7 @@ public class DexAccountsScreen extends Screen {
 
     @Override
     protected void init() {
-        int listWidth = Math.min(420, this.width - 40);
+        int listWidth = Math.min(440, this.width - 40);
         int listHeight = this.height - 130;
         int listY = 40;
 
@@ -42,7 +42,7 @@ public class DexAccountsScreen extends Screen {
         accountList.setX((this.width - listWidth) / 2);
         this.addDrawableChild(accountList);
 
-        int buttonWidth = 100;
+        int buttonWidth = 115;
         int buttonSpacing = 6;
         int row1Y = this.height - 75;
         int row2Y = this.height - 50;
@@ -56,14 +56,14 @@ public class DexAccountsScreen extends Screen {
                 .build();
         this.addDrawableChild(useButton);
 
-        ButtonWidget addButton = ButtonWidget.builder(Text.literal("Add Account"), button -> {
+        ButtonWidget addButton = ButtonWidget.builder(Text.literal("Add Session ID"), button -> {
             if (this.client != null) {
                 this.client.setScreen(new AddAccountDialog(this));
             }
         }).dimensions(row1StartX + buttonWidth + buttonSpacing, row1Y, buttonWidth, 20).build();
         this.addDrawableChild(addButton);
 
-        deleteButton = ButtonWidget.builder(Text.literal("Delete"), button -> {
+        deleteButton = ButtonWidget.builder(Text.literal("Delete Account"), button -> {
             if (selectedAccount != null) {
                 DexSessionLogin.getAccountManager().removeAccount(selectedAccount);
                 selectedAccount = null;
@@ -77,7 +77,7 @@ public class DexAccountsScreen extends Screen {
         int row2TotalWidth = (buttonWidth * 3) + (buttonSpacing * 2);
         int row2StartX = (this.width - row2TotalWidth) / 2;
 
-        ButtonWidget directButton = ButtonWidget.builder(Text.literal("Direct Login"), button -> {
+        ButtonWidget directButton = ButtonWidget.builder(Text.literal("Enter Session ID"), button -> {
             if (this.client != null) {
                 this.client.setScreen(new DirectTokenLoginScreen(this));
             }
@@ -134,7 +134,7 @@ public class DexAccountsScreen extends Screen {
 
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
-                Text.literal("DexSessionLogin - Accounts").formatted(Formatting.BOLD, Formatting.GOLD),
+                Text.literal("DexSessionLogin - Account Manager").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
                 10,
                 0xFFFFFF

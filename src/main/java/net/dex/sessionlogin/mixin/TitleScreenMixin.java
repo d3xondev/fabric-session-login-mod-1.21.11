@@ -35,19 +35,17 @@ public abstract class TitleScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        int accountsButtonX = this.width - 85;
-        int editButtonX = this.width - 170;
+        int sessionLoginButtonX = this.width - 100;
+        int editButtonX = this.width - 160;
         int buttonY = 5;
-        int buttonWidth = 80;
-        int buttonHeight = 20;
 
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("Accounts"), button -> {
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Session Login"), button -> {
             MinecraftClient.getInstance().setScreen(new DexAccountsScreen(this));
-        }).dimensions(accountsButtonX, buttonY, buttonWidth, buttonHeight).build());
+        }).dimensions(sessionLoginButtonX, buttonY, 95, 20).build());
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Edit"), button -> {
             MinecraftClient.getInstance().setScreen(new EditAccountScreen(this));
-        }).dimensions(editButtonX, buttonY, buttonWidth, buttonHeight).build());
+        }).dimensions(editButtonX, buttonY, 55, 20).build());
 
         this.addDrawable((context, mouseX, mouseY, delta) -> {
             Session session = DexSessionLogin.getCurrentSession();

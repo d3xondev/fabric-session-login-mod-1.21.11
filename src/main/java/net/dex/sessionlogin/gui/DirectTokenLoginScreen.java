@@ -19,7 +19,7 @@ public class DirectTokenLoginScreen extends Screen {
     private Text statusMessage = Text.empty();
 
     public DirectTokenLoginScreen(Screen parent) {
-        super(Text.literal("Direct Token Login"));
+        super(Text.literal("Login with Session ID"));
         this.parent = parent;
     }
 
@@ -34,14 +34,14 @@ public class DirectTokenLoginScreen extends Screen {
                 centerY - 25,
                 300,
                 20,
-                Text.literal("Token Input")
+                Text.literal("Session ID Input")
         );
         tokenField.setMaxLength(32767);
-        tokenField.setPlaceholder(Text.literal("Paste session token / access token...").formatted(Formatting.GRAY));
+        tokenField.setPlaceholder(Text.literal("Paste Session ID here...").formatted(Formatting.GRAY));
         this.addDrawableChild(tokenField);
         this.setInitialFocus(tokenField);
 
-        saveCheckbox = CheckboxWidget.builder(Text.literal("Also save to Accounts list"), this.textRenderer)
+        saveCheckbox = CheckboxWidget.builder(Text.literal("Save Session ID to Accounts list"), this.textRenderer)
                 .pos(centerX - 150, centerY + 5)
                 .checked(true)
                 .build();
@@ -50,19 +50,19 @@ public class DirectTokenLoginScreen extends Screen {
         loginButton = ButtonWidget.builder(Text.literal("Login"), button -> {
             String token = tokenField.getText().trim();
             if (token.isEmpty()) {
-                statusMessage = Text.literal("Token cannot be empty").formatted(Formatting.RED);
+                statusMessage = Text.literal("Session ID cannot be empty").formatted(Formatting.RED);
                 return;
             }
 
             loginButton.active = false;
-            statusMessage = Text.literal("Authenticating with Mojang...").formatted(Formatting.YELLOW);
+            statusMessage = Text.literal("Validating Session ID with Mojang...").formatted(Formatting.YELLOW);
 
             MojangApiService.fetchProfileAsync(token).whenComplete((profile, throwable) -> {
                 if (this.client != null) {
                     this.client.execute(() -> {
                         loginButton.active = true;
                         if (throwable != null || profile == null) {
-                            statusMessage = Text.literal("Invalid Session Token!").formatted(Formatting.RED);
+                            statusMessage = Text.literal("Invalid Session ID!").formatted(Formatting.RED);
                         } else {
                             if (saveCheckbox.isChecked()) {
                                 Account account = new Account(profile.name(), profile.uuid(), token);
@@ -94,9 +94,17 @@ public class DirectTokenLoginScreen extends Screen {
 
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
-                Text.literal("Direct Session Token Login").formatted(Formatting.BOLD, Formatting.AQUA),
+                Text.literal("Login with Session ID").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
                 this.height / 2 - 60,
+                0xFFFFFF
+        );
+
+        context.drawTextWithShadow(
+                this.textRenderer,
+                Text.literal("Enter Session ID:").formatted(Formatting.WHITE),
+                this.width / 2 - 150,
+                this.height / 2 - 38,
                 0xFFFFFF
         );
 
