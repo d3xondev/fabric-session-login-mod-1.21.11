@@ -1,14 +1,21 @@
 package net.dex.sessionlogin.gui;
 
+import com.mojang.authlib.GameProfile;
 import net.dex.sessionlogin.DexSessionLogin;
 import net.dex.sessionlogin.account.Account;
 import net.dex.sessionlogin.gui.widget.AccountListWidget;
+import net.dex.sessionlogin.service.MojangApiService;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.session.Session;
+import net.minecraft.entity.player.SkinTextures;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import java.util.UUID;
+import java.util.function.Supplier;
 
 public class DexAccountsScreen extends Screen {
     private final Screen parent;
@@ -20,6 +27,10 @@ public class DexAccountsScreen extends Screen {
     private ButtonWidget restoreButton;
     private Text feedbackMessage = Text.empty();
 
+    private Boolean isCurrentSessionValid = null;
+    private String lastCheckedToken = null;
+    private boolean isChecking = false;
+
     public DexAccountsScreen(Screen parent) {
         super(Text.literal("DexSessionLogin"));
         this.parent = parent;
@@ -27,19 +38,18 @@ public class DexAccountsScreen extends Screen {
 
     @Override
     protected void init() {
-        int listWidth = Math.min(440, this.width - 40);
-        int listHeight = this.height - 130;
-        int listY = 40;
+        int listY = 52;
+        int listHeight = this.height - listY - 80;
 
         accountList = new AccountListWidget(
                 this,
                 this.client,
-                listWidth,
+                this.width,
                 listHeight,
                 listY,
-                32
+                36
         );
-        accountList.setX((this.width - listWidth) / 2);
+        accountList.position(this.width, listHeight, 0, listY);
         this.addDrawableChild(accountList);
 
         int buttonWidth = 115;
@@ -136,17 +146,57 @@ public class DexAccountsScreen extends Screen {
                 this.textRenderer,
                 Text.literal("DexSessionLogin - Account Manager").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
-                10,
+                6,
                 0xFFFFFF
         );
 
         Session currentSession = DexSessionLogin.getCurrentSession();
         String currentName = currentSession != null ? currentSession.getUsername() : "Unknown";
-        Text activeInfo = Text.literal("Logged in as: ").formatted(Formatting.GRAY)
-                .append(Text.literal(currentName).formatted(Formatting.WHITE, Formatting.BOLD))
-                .append(DexSessionLogin.isOriginalSession() ? Text.literal(" (Original)").formatted(Formatting.DARK_GRAY) : Text.literal(" (Custom Session)").formatted(Formatting.GREEN));
+        String currentToken = currentSession != null ? currentSession.getAccessToken() : "";
+        UUID currentUuid = currentSession != null ? currentSession.getUuidOrNull() : null;
 
-        context.drawCenteredTextWithShadow(this.textRenderer, activeInfo, this.width / 2, 25, 0xFFFFFF);
+        if (currentToken != null && !currentToken.equals(lastCheckedToken)) {
+            lastCheckedToken = currentToken;
+            isCurrentSessionValid = null;
+            isChecking = false;
+        }
+
+        if (isCurrentSessionValid == null && !isChecking && currentToken != null && !currentToken.isEmpty()) {
+            isChecking = true;
+            MojangApiService.validateTokenAsync(currentToken, currentName, currentUuid).thenAccept(valid -> {
+                isCurrentSessionValid = valid;
+                isChecking = false;
+            });
+        }
+
+        int cardWidth = Math.min(340, this.width - 20);
+        int cardX = (this.width - cardWidth) / 2;
+        int cardY = 19;
+        context.fill(cardX, cardY, cardX + cardWidth, cardY + 28, 0x66000000);
+
+        if (currentUuid != null && currentName != null && this.client != null) {
+            Supplier<SkinTextures> skinSupplier = this.client.getSkinProvider().supplySkinTextures(
+                    new GameProfile(currentUuid, currentName),
+                    true
+            );
+            PlayerSkinDrawer.draw(context, skinSupplier.get(), cardX + 6, cardY + 4, 20);
+        }
+
+        Text userText = Text.literal(currentName).formatted(Formatting.BOLD, Formatting.WHITE);
+        Text sessionType = DexSessionLogin.isOriginalSession()
+                ? Text.literal(" (Original)").formatted(Formatting.DARK_GRAY)
+                : Text.literal(" (Custom Session)").formatted(Formatting.GREEN);
+        context.drawTextWithShadow(this.textRenderer, Text.empty().append(userText).append(sessionType), cardX + 32, cardY + 5, 0xFFFFFF);
+
+        Text statusBadge;
+        if (isCurrentSessionValid == null) {
+            statusBadge = Text.literal("[... Checking]").formatted(Formatting.GRAY);
+        } else if (isCurrentSessionValid) {
+            statusBadge = Text.literal("[✔] Valid Session").formatted(Formatting.GREEN);
+        } else {
+            statusBadge = Text.literal("[✘] Invalid Session").formatted(Formatting.RED);
+        }
+        context.drawTextWithShadow(this.textRenderer, statusBadge, cardX + 32, cardY + 16, 0xFFFFFF);
 
         if (!feedbackMessage.getString().isEmpty()) {
             context.drawCenteredTextWithShadow(this.textRenderer, feedbackMessage, this.width / 2, this.height - 90, 0xFFFFFF);
