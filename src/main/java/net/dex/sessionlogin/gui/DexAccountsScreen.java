@@ -1,10 +1,10 @@
 package net.dex.sessionlogin.gui;
 
-import com.mojang.authlib.GameProfile;
 import net.dex.sessionlogin.DexSessionLogin;
 import net.dex.sessionlogin.account.Account;
 import net.dex.sessionlogin.gui.widget.AccountListWidget;
 import net.dex.sessionlogin.service.MojangApiService;
+import net.dex.sessionlogin.service.SkinManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.screen.Screen;
@@ -147,7 +147,7 @@ public class DexAccountsScreen extends Screen {
                 Text.literal("DexSessionLogin - Account Manager").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
                 6,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
         Session currentSession = DexSessionLogin.getCurrentSession();
@@ -174,19 +174,23 @@ public class DexAccountsScreen extends Screen {
         int cardY = 19;
         context.fill(cardX, cardY, cardX + cardWidth, cardY + 28, 0x66000000);
 
-        if (currentUuid != null && currentName != null && this.client != null) {
-            Supplier<SkinTextures> skinSupplier = this.client.getSkinProvider().supplySkinTextures(
-                    new GameProfile(currentUuid, currentName),
-                    true
-            );
-            PlayerSkinDrawer.draw(context, skinSupplier.get(), cardX + 6, cardY + 4, 20);
-        }
+        UUID headUuid = currentUuid != null ? currentUuid : UUID.nameUUIDFromBytes(("OfflinePlayer:" + currentName).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        Supplier<SkinTextures> skinSupplier = SkinManager.getSkin(headUuid, currentName);
+        PlayerSkinDrawer.draw(context, skinSupplier.get(), cardX + 6, cardY + 4, 20);
 
-        Text userText = Text.literal(currentName).formatted(Formatting.BOLD, Formatting.WHITE);
+        Text userPrefix = Text.literal("Logged in: ").formatted(Formatting.GRAY);
+        Text userName = Text.literal(currentName).formatted(Formatting.BOLD, Formatting.GREEN);
         Text sessionType = DexSessionLogin.isOriginalSession()
                 ? Text.literal(" (Original)").formatted(Formatting.DARK_GRAY)
                 : Text.literal(" (Custom Session)").formatted(Formatting.GREEN);
-        context.drawTextWithShadow(this.textRenderer, Text.empty().append(userText).append(sessionType), cardX + 32, cardY + 5, 0xFFFFFF);
+
+        context.drawTextWithShadow(
+                this.textRenderer,
+                Text.empty().append(userPrefix).append(userName).append(sessionType),
+                cardX + 32,
+                cardY + 5,
+                0xFFFFFFFF
+        );
 
         Text statusBadge;
         if (isCurrentSessionValid == null) {
@@ -196,10 +200,10 @@ public class DexAccountsScreen extends Screen {
         } else {
             statusBadge = Text.literal("[✘] Invalid Session").formatted(Formatting.RED);
         }
-        context.drawTextWithShadow(this.textRenderer, statusBadge, cardX + 32, cardY + 16, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, statusBadge, cardX + 32, cardY + 16, 0xFFFFFFFF);
 
         if (!feedbackMessage.getString().isEmpty()) {
-            context.drawCenteredTextWithShadow(this.textRenderer, feedbackMessage, this.width / 2, this.height - 90, 0xFFFFFF);
+            context.drawCenteredTextWithShadow(this.textRenderer, feedbackMessage, this.width / 2, this.height - 90, 0xFFFFFFFF);
         }
     }
 

@@ -4,6 +4,7 @@ import net.dex.sessionlogin.DexSessionLogin;
 import net.dex.sessionlogin.account.Account;
 import net.dex.sessionlogin.account.AccountManager;
 import net.dex.sessionlogin.service.MojangApiService;
+import net.dex.sessionlogin.service.SkinManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -112,6 +113,9 @@ public class EditAccountScreen extends Screen {
                     this.client.execute(() -> {
                         skinButton.active = true;
                         if (code == 200) {
+                            if (session != null) {
+                                SkinManager.invalidate(session.getUuidOrNull());
+                            }
                             statusMessage = Text.literal("Successfully updated skin!").formatted(Formatting.GREEN);
                         } else if (code == 429) {
                             statusMessage = Text.literal("Rate limit reached. Try again later.").formatted(Formatting.RED);
@@ -147,11 +151,11 @@ public class EditAccountScreen extends Screen {
                 Text.literal("Edit Account (Name & Skin)").formatted(Formatting.BOLD, Formatting.AQUA),
                 this.width / 2,
                 this.height / 2 - 80,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
-        context.drawTextWithShadow(this.textRenderer, Text.literal("Username:"), this.width / 2 - 100, this.height / 2 - 62, 0xAAAAAA);
-        context.drawTextWithShadow(this.textRenderer, Text.literal("Skin URL:"), this.width / 2 - 100, this.height / 2 - 17, 0xAAAAAA);
+        context.drawTextWithShadow(this.textRenderer, Text.literal("Username:"), this.width / 2 - 100, this.height / 2 - 62, 0xFFAAAAAA);
+        context.drawTextWithShadow(this.textRenderer, Text.literal("Skin URL:"), this.width / 2 - 100, this.height / 2 - 17, 0xFFAAAAAA);
 
         if (!statusMessage.getString().isEmpty()) {
             context.drawCenteredTextWithShadow(
@@ -159,7 +163,7 @@ public class EditAccountScreen extends Screen {
                     statusMessage,
                     this.width / 2,
                     this.height / 2 + 85,
-                    0xFFFFFF
+                    0xFFFFFFFF
             );
         }
     }

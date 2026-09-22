@@ -97,7 +97,7 @@ public class DirectTokenLoginScreen extends Screen {
                 Text.literal("Login with Session ID").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
                 this.height / 2 - 60,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
         context.drawTextWithShadow(
@@ -105,7 +105,7 @@ public class DirectTokenLoginScreen extends Screen {
                 Text.literal("Enter Session ID:").formatted(Formatting.WHITE),
                 this.width / 2 - 150,
                 this.height / 2 - 38,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
         if (!statusMessage.getString().isEmpty()) {
@@ -114,7 +114,7 @@ public class DirectTokenLoginScreen extends Screen {
                     statusMessage,
                     this.width / 2,
                     this.height / 2 + 65,
-                    0xFFFFFF
+                    0xFFFFFFFF
             );
         }
     }

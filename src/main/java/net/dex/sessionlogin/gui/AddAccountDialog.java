@@ -99,7 +99,7 @@ public class AddAccountDialog extends Screen {
                 Text.literal("Add Account via Session ID").formatted(Formatting.BOLD, Formatting.GOLD),
                 this.width / 2,
                 this.height / 2 - 60,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
         context.drawTextWithShadow(
@@ -107,7 +107,7 @@ public class AddAccountDialog extends Screen {
                 Text.literal("Enter Session ID:").formatted(Formatting.WHITE),
                 this.width / 2 - 150,
                 this.height / 2 - 38,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
         if (!statusMessage.getString().isEmpty()) {
@@ -116,7 +116,7 @@ public class AddAccountDialog extends Screen {
                     statusMessage,
                     this.width / 2,
                     this.height / 2 + 65,
-                    0xFFFFFF
+                    0xFFFFFFFF
             );
         }
     }

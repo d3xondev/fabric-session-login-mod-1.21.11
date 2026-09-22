@@ -81,7 +81,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
                     .append(Text.literal(" | ").formatted(Formatting.DARK_GRAY))
                     .append(statusText);
 
-            context.drawText(this.textRenderer, display, 8, 10, 0xFFFFFF, true);
+            context.drawText(this.textRenderer, display, 8, 10, 0xFFFFFFFF, true);
         });
     }
 }

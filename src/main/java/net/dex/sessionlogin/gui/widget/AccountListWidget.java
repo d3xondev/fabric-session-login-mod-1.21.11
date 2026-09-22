@@ -1,9 +1,9 @@
 package net.dex.sessionlogin.gui.widget;
 
-import com.mojang.authlib.GameProfile;
 import net.dex.sessionlogin.DexSessionLogin;
 import net.dex.sessionlogin.account.Account;
 import net.dex.sessionlogin.gui.DexAccountsScreen;
+import net.dex.sessionlogin.service.SkinManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
@@ -48,15 +48,10 @@ public class AccountListWidget extends AlwaysSelectedEntryListWidget<AccountList
 
     public class AccountEntry extends AlwaysSelectedEntryListWidget.Entry<AccountEntry> {
         private final Account account;
-        private final Supplier<SkinTextures> skinSupplier;
         private long lastClickTime = 0;
 
         public AccountEntry(Account account) {
             this.account = account;
-            this.skinSupplier = client.getSkinProvider().supplySkinTextures(
-                    new GameProfile(account.getUuid(), account.getUsername()),
-                    true
-            );
         }
 
         public Account getAccount() {
@@ -77,18 +72,22 @@ public class AccountListWidget extends AlwaysSelectedEntryListWidget<AccountList
             boolean isActive = DexSessionLogin.getCurrentSession() != null &&
                     account.getUuid().equals(DexSessionLogin.getCurrentSession().getUuidOrNull());
 
+            Supplier<SkinTextures> skinSupplier = SkinManager.getSkin(account.getUuid(), account.getUsername());
             PlayerSkinDrawer.draw(context, skinSupplier.get(), x + 6, y + 4, 24);
 
-            Text usernameText = Text.literal(account.getUsername()).formatted(Formatting.BOLD, Formatting.WHITE);
-            context.drawTextWithShadow(client.textRenderer, usernameText, x + 36, y + 6, 0xFFFFFF);
+            Text usernameText = Text.literal(account.getUsername()).formatted(
+                    Formatting.BOLD,
+                    isActive ? Formatting.GREEN : Formatting.WHITE
+            );
+            context.drawTextWithShadow(client.textRenderer, usernameText, x + 36, y + 6, 0xFFFFFFFF);
 
             String uuidStr = account.getUuid().toString();
-            context.drawTextWithShadow(client.textRenderer, Text.literal(uuidStr).formatted(Formatting.GRAY), x + 36, y + 18, 0x888888);
+            context.drawTextWithShadow(client.textRenderer, Text.literal(uuidStr).formatted(Formatting.GRAY), x + 36, y + 18, 0xFFAAAAAA);
 
             if (isActive) {
                 Text activeText = Text.literal("[ACTIVE]").formatted(Formatting.GREEN, Formatting.BOLD);
                 int textWidth = client.textRenderer.getWidth(activeText);
-                context.drawTextWithShadow(client.textRenderer, activeText, x + width - textWidth - 10, y + 12, 0x55FF55);
+                context.drawTextWithShadow(client.textRenderer, activeText, x + width - textWidth - 10, y + 12, 0xFF55FF55);
             }
         }
 
