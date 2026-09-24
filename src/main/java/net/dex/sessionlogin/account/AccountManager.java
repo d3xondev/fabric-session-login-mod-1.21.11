@@ -93,6 +93,14 @@ public class AccountManager {
     }
 
     public synchronized Account getActiveAccount() {
+        Session cur = DexSessionLogin.getCurrentSession();
+        if (cur != null && cur.getUuidOrNull() != null) {
+            for (Account acc : accounts) {
+                if (acc.getUuid().equals(cur.getUuidOrNull())) {
+                    return acc;
+                }
+            }
+        }
         return activeAccount;
     }
 
